@@ -1,5 +1,6 @@
-package com.matidominati.shoppingcartservice.shoppingcartservice.model;
+package com.matidominati.shoppingcartservice.shoppingcartservice.model.dto;
 
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartItem;
 import lombok.Data;
 
 import java.math.BigDecimal;

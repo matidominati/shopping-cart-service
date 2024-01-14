@@ -1,7 +1,7 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.controller;
 
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartItem;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartTO;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartItem;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartTO;
 import com.matidominati.shoppingcartservice.shoppingcartservice.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

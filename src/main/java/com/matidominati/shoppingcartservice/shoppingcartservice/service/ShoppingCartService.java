@@ -6,8 +6,8 @@ import com.matidominati.shoppingcartservice.shoppingcartservice.exception.DataNo
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.CartMapper;
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.ProductMapper;
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartEntity;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartItem;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartTO;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartItem;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartTO;
 import com.matidominati.shoppingcartservice.shoppingcartservice.repository.ShoppingCartRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

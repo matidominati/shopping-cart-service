@@ -1,7 +1,7 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.mapper;
 
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartEntity;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartTO;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

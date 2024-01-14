@@ -1,10 +1,9 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartItem;
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,9 +25,15 @@ public class CartEntity {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private BigDecimal totalPrice;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "cart_id")
     private List<CartItem> cartItems;
     private String discountCode;
     private BigDecimal discountPercentage;
+    @ElementCollection
+    @CollectionTable(name = "cart_discounts", joinColumns = @JoinColumn(name = "cart_id"))
+    @MapKeyColumn(name = "discount_key")
+    @Column(name = "discount_value")
     private Map<String, BigDecimal> discounts;
 
     public static CartEntity create() {
