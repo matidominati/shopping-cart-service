@@ -2,6 +2,7 @@ package com.matidominati.shoppingcartservice.shoppingcartservice.service;
 
 import com.matidominati.shoppingcartservice.shoppingcartservice.client.ProductClient;
 import com.matidominati.shoppingcartservice.shoppingcartservice.client.model.ProductTO;
+import com.matidominati.shoppingcartservice.shoppingcartservice.exception.DataNotFoundException;
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.CartMapper;
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.ProductMapper;
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartEntity;
@@ -28,11 +29,24 @@ public class ShoppingCartService {
     private final CartMapper cartMapper;
     private final ProductMapper productMapper;
 
-    public CartTO getCart(Long id) {
-        log.info("Process of displaying the contents of the shopping cart has started.");
-        CartEntity cart = cartRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Shopping cart not found."));
+    public CartTO getCart(Long cartId) {
+        log.info("Process of displaying shopping cart with ID: {} has started.", cartId);
+        CartEntity cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
         return cartMapper.map(cart);
+    }
+
+    public List<CartItem> getCartItems(Long cartId) {
+        log.info("Process of displaying the contents of the shopping cart has started.");
+        CartEntity cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
+        return cart.getCartItems();
+    }
+
+    public BigDecimal getTotalPrice(Long cartId) {
+        CartEntity cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
+        return cart.getTotalPrice();
     }
 
     @Transactional
@@ -50,7 +64,7 @@ public class ShoppingCartService {
     @Transactional
     public CartTO addAnotherProduct(Long cartId, Long productId, int quantity) {
         CartEntity cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Shopping cart not found."));
+                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
         Optional<ProductTO> productTO = productClient.getProductById(productId);
         CartItem newItem = productMapper.map(productTO.get());
         newItem.setQuantity(quantity);
@@ -64,7 +78,7 @@ public class ShoppingCartService {
     @Transactional
     public CartTO removeProduct(Long cartId, Long itemId) {
         CartEntity cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Shopping cart not found."));
+                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
 
         Optional<CartItem> itemToRemove = cart.getCartItems().stream()
                 .filter(item -> item.getProductId().equals(itemId))
@@ -86,10 +100,21 @@ public class ShoppingCartService {
     public void deleteCart(Long cartId) {
         Optional<CartEntity> cartToDelete = cartRepository.findById(cartId);
         if (cartToDelete.isEmpty()) {
-            throw new RuntimeException("Cart with given ID does not exist.");
+            throw new DataNotFoundException("Cart with given ID does not exist.");
         }
         cartRepository.delete(cartToDelete.get());
         log.info("Cart with ID: {} has ben deleted.", cartId);
+    }
+
+    @Transactional
+    public CartTO clearCart(Long cartId) {
+        CartEntity cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
+        cart.getCartItems().clear();
+        cart.setTotalPrice(BigDecimal.ZERO);
+        cartRepository.save(cart);
+        log.info("Shopping cart cleared. Cart ID: {}.", cartId);
+        return cartMapper.map(cart);
     }
 
     private CartEntity createCart() {
