@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +18,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShoppingCartEntity {
+public class CartEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,11 +28,21 @@ public class ShoppingCartEntity {
     private List<CartItem> cartItems;
     private String discountCode;
 
+    public static CartEntity create() {
+        return CartEntity.builder()
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .cartItems(new ArrayList<>())
+                .discountCode(null)
+                .totalPrice(BigDecimal.ZERO)
+                .build();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShoppingCartEntity shoppingCart = (ShoppingCartEntity) o;
+        CartEntity shoppingCart = (CartEntity) o;
         return id != null && Objects.equals(id, shoppingCart.id);
     }
     @Override

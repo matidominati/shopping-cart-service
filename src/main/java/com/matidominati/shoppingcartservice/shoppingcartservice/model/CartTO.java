@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class ShoppingCartTO {
+public class CartTO {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private BigDecimal totalPrice;
     private List<CartItem> cartItems;
-    boolean hasDiscountCode;
+    private String discountCode;
 }
