@@ -1,6 +1,6 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.controller;
 
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartItem;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartItemEntity;
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartTO;
 import com.matidominati.shoppingcartservice.shoppingcartservice.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class CartController {
     }
 
     @GetMapping("/{cartId}/items")
-    public List<CartItem> getCartItems(@PathVariable Long cartId) {
+    public List<CartItemEntity> getCartItems(@PathVariable Long cartId) {
         return cartService.getCartItems(cartId);
     }
 
@@ -32,7 +32,7 @@ public class CartController {
     }
 
     @PostMapping("/{productId}/add")
-    public CartTO addFirstProduct(@PathVariable Long productId, @RequestParam int quantity) {
+    public CartTO addFirstProduct(@PathVariable Long productId, @RequestParam (defaultValue = "1") int quantity) {
         return cartService.addFirstProduct(productId, quantity);
     }
 
@@ -46,7 +46,7 @@ public class CartController {
         return cartService.applyDiscountCode(cartId, discountCode);
     }
 
-    @DeleteMapping("/{cartId}/remove")
+    @PatchMapping("/{cartId}/remove")
     public CartTO removeProduct(@PathVariable Long cartId, @RequestParam Long itemId) {
         return cartService.removeProduct(cartId, itemId);
     }
@@ -56,7 +56,7 @@ public class CartController {
         cartService.deleteCart(cartId);
     }
 
-    @DeleteMapping("/{cartId}/clear")
+    @PutMapping("/{cartId}/clear")
     public CartTO clearCart(@PathVariable Long cartId) {
         return cartService.clearCart(cartId);
     }

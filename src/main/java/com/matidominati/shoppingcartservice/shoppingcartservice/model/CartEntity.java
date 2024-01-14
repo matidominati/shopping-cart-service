@@ -1,6 +1,5 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.model;
 
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +26,7 @@ public class CartEntity {
     private BigDecimal totalPrice;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cart_id")
-    private List<CartItem> cartItems;
+    private List<CartItemEntity> cartItemEntities;
     private String discountCode;
     private BigDecimal discountPercentage;
     @ElementCollection
@@ -40,7 +39,7 @@ public class CartEntity {
         return CartEntity.builder()
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
-                .cartItems(new ArrayList<>())
+                .cartItemEntities(new ArrayList<>())
                 .discountCode(null)
                 .totalPrice(BigDecimal.ZERO)
                 .build();

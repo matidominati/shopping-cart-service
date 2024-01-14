@@ -1,6 +1,5 @@
-package com.matidominati.shoppingcartservice.shoppingcartservice.model.dto;
+package com.matidominati.shoppingcartservice.shoppingcartservice.model;
 
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,15 +13,16 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartItem {
+public class CartItemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long productId;
     private String productName;
-    private int quantity;
-    private BigDecimal productPrice;
+    private String productType;
+    private String productDescription;
+    private BigDecimal basePrice;
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private CartEntity cart;
+    private int quantity;
 }

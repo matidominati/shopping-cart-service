@@ -6,7 +6,7 @@ import com.matidominati.shoppingcartservice.shoppingcartservice.exception.DataNo
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.CartMapper;
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.ProductMapper;
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartEntity;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartItem;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartItemEntity;
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartTO;
 import com.matidominati.shoppingcartservice.shoppingcartservice.repository.ShoppingCartRepository;
 import jakarta.transaction.Transactional;
@@ -36,11 +36,11 @@ public class ShoppingCartService {
         return cartMapper.map(cart);
     }
 
-    public List<CartItem> getCartItems(Long cartId) {
+    public List<CartItemEntity> getCartItems(Long cartId) {
         log.info("Process of displaying the contents of the shopping cart has started.");
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-        return cart.getCartItems();
+        return cart.getCartItemEntities();
     }
 
     public BigDecimal getTotalPrice(Long cartId) {
@@ -52,10 +52,10 @@ public class ShoppingCartService {
     @Transactional
     public CartTO addFirstProduct(Long productId, int quantity) {
         Optional<ProductTO> productTO = productClient.getProductById(productId);
-        CartItem item = productMapper.map(productTO.get());
+        CartItemEntity item = productMapper.map(productTO.get());
         CartEntity cart = createCart();
         item.setQuantity(quantity);
-        cart.getCartItems().add(item);
+        cart.getCartItemEntities().add(item);
         cart.setTotalPrice(calculateTotalPrice(cart));
         cartRepository.save(cart);
         return cartMapper.map(cart);
@@ -66,9 +66,9 @@ public class ShoppingCartService {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
         Optional<ProductTO> productTO = productClient.getProductById(productId);
-        CartItem newItem = productMapper.map(productTO.get());
+        CartItemEntity newItem = productMapper.map(productTO.get());
         newItem.setQuantity(quantity);
-        cart.getCartItems().add(newItem);
+        cart.getCartItemEntities().add(newItem);
         cart.setTotalPrice(calculateTotalPrice(cart));
         cart.setModifiedAt(LocalDateTime.now());
         cartRepository.save(cart);
@@ -102,12 +102,12 @@ public class ShoppingCartService {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
 
-        Optional<CartItem> itemToRemove = cart.getCartItems().stream()
-                .filter(item -> item.getProductId().equals(itemId))
+        Optional<CartItemEntity> itemToRemove = cart.getCartItemEntities().stream()
+                .filter(item -> item.getId().equals(itemId))
                 .findFirst();
 
         if (itemToRemove.isPresent()) {
-            cart.getCartItems().remove(itemToRemove.get());
+            cart.getCartItemEntities().remove(itemToRemove.get());
             cart.setTotalPrice(calculateTotalPrice(cart));
             cart.setModifiedAt(LocalDateTime.now());
             cartRepository.save(cart);
@@ -132,7 +132,7 @@ public class ShoppingCartService {
     public CartTO clearCart(Long cartId) {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-        cart.getCartItems().clear();
+        cart.getCartItemEntities().clear();
         cart.setTotalPrice(BigDecimal.ZERO);
         cartRepository.save(cart);
         log.info("Shopping cart cleared. Cart ID: {}.", cartId);
@@ -148,8 +148,8 @@ public class ShoppingCartService {
     }
 
     private BigDecimal calculateTotalPrice(CartEntity cart) {
-        return cart.getCartItems().stream()
-                .map(item -> item.getProductPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+        return cart.getCartItemEntities().stream()
+                .map(item -> item.getBasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

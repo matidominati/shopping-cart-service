@@ -14,6 +14,6 @@ public class ProductTO {
     private String productName;
     private String productType;
     private String productDescription;
-    private BigDecimal price;
+    private BigDecimal basePrice;
 }
 
