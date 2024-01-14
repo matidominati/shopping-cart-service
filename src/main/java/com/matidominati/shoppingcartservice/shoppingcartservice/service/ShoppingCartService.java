@@ -76,6 +76,28 @@ public class ShoppingCartService {
     }
 
     @Transactional
+    public CartTO applyDiscountCode(Long cartId, String discountCode) {
+        CartEntity cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
+
+        if (cart.getDiscounts() != null && cart.getDiscounts().containsKey(discountCode)) {
+            BigDecimal discountPercentage = cart.getDiscounts().get(discountCode);
+            BigDecimal discountAmount = cart.getTotalPrice().multiply(discountPercentage);
+
+            cart.setDiscountCode(discountCode);
+            cart.setDiscountPercentage(discountPercentage);
+            cart.setTotalPrice(cart.getTotalPrice().subtract(discountAmount));
+            cartRepository.save(cart);
+            log.info("Discount code '{}' applied to cart with ID: {}. New total price: {}",
+                    discountCode, cartId, cart.getTotalPrice());
+        } else {
+            log.warn("Invalid or not applicable discount code '{}' for cart with ID: {}", discountCode, cartId);
+        }
+        return cartMapper.map(cart);
+    }
+
+
+    @Transactional
     public CartTO removeProduct(Long cartId, Long itemId) {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));

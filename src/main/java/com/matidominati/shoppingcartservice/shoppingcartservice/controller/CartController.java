@@ -4,7 +4,6 @@ import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartItem;
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartTO;
 import com.matidominati.shoppingcartservice.shoppingcartservice.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -37,9 +36,14 @@ public class CartController {
         return cartService.addFirstProduct(productId, quantity);
     }
 
-    @PostMapping("/{cartId}/add")
+    @PatchMapping("/{cartId}/add")
     public CartTO addAnotherProduct(@PathVariable Long cartId, @RequestParam Long productId, @RequestParam int quantity) {
         return cartService.addAnotherProduct(cartId, productId, quantity);
+    }
+
+    @PatchMapping("/{cartId}/code")
+    public CartTO applyDiscountCode(@PathVariable Long cartId, @RequestParam String discountCode) {
+        return cartService.applyDiscountCode(cartId, discountCode);
     }
 
     @DeleteMapping("/{cartId}/remove")

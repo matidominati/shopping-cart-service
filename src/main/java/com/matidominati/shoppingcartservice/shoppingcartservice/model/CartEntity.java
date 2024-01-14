@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
@@ -27,6 +28,8 @@ public class CartEntity {
     private BigDecimal totalPrice;
     private List<CartItem> cartItems;
     private String discountCode;
+    private BigDecimal discountPercentage;
+    private Map<String, BigDecimal> discounts;
 
     public static CartEntity create() {
         return CartEntity.builder()
