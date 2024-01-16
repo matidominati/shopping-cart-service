@@ -21,6 +21,7 @@ public class CartItemEntity {
     private String productType;
     private String productDescription;
     private BigDecimal basePrice;
+    private BigDecimal totalPrice;
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private CartEntity cart;

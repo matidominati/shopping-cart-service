@@ -50,9 +50,9 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public CartTO addFirstProduct(Long productId, int quantity) {
-        Optional<ProductTO> productTO = productClient.getProductById(productId);
-        CartItemEntity item = productMapper.map(productTO.get());
+    public CartTO addFirstProduct(Long productId, int quantity, List<String> selectedConfigurations, List<String> selectedAccessories) {
+        ProductTO baseProduct = productClient.customize(productId, selectedConfigurations, selectedAccessories);
+        CartItemEntity item = productMapper.map(baseProduct);
         CartEntity cart = createCart();
         item.setQuantity(quantity);
         cart.getCartItemEntities().add(item);
@@ -62,11 +62,11 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public CartTO addAnotherProduct(Long cartId, Long productId, int quantity) {
+    public CartTO addAnotherProduct(Long cartId, Long productId, int quantity, List<String> selectedConfigurations, List<String> selectedAccessories) {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-        Optional<ProductTO> productTO = productClient.getProductById(productId);
-        CartItemEntity newItem = productMapper.map(productTO.get());
+        ProductTO baseProduct = productClient.customize(productId, selectedConfigurations, selectedAccessories);
+        CartItemEntity newItem = productMapper.map(baseProduct);
         newItem.setQuantity(quantity);
         cart.getCartItemEntities().add(newItem);
         cart.setTotalPrice(calculateTotalPrice(cart));

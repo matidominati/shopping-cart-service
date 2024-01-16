@@ -1,9 +1,6 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.client.model;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -15,5 +12,8 @@ public class ProductTO {
     private String productType;
     private String productDescription;
     private BigDecimal basePrice;
+    private BigDecimal totalPrice;
+    private Map<String, ProductAccessoryTO> accessories;
+    private Map<String, ProductConfigurationTO> configurations;
 }
 

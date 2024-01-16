@@ -32,13 +32,24 @@ public class CartController {
     }
 
     @PostMapping("/{productId}/add")
-    public CartTO addFirstProduct(@PathVariable Long productId, @RequestParam (defaultValue = "1") int quantity) {
-        return cartService.addFirstProduct(productId, quantity);
+    public CartTO addFirstProduct(@PathVariable Long productId,
+                                  @RequestParam(defaultValue = "1") int quantity,
+                                  @RequestParam(required = false)
+                                  List<String> selectedConfigurations,
+                                  @RequestParam(required = false)
+                                  List<String> selectedAccessories) {
+        return cartService.addFirstProduct(productId, quantity, selectedConfigurations, selectedAccessories);
     }
 
     @PatchMapping("/{cartId}/add")
-    public CartTO addAnotherProduct(@PathVariable Long cartId, @RequestParam Long productId, @RequestParam int quantity) {
-        return cartService.addAnotherProduct(cartId, productId, quantity);
+    public CartTO addAnotherProduct(@PathVariable Long cartId,
+                                    @RequestParam Long productId,
+                                    @RequestParam(defaultValue = "1") int quantity,
+                                    @RequestParam(required = false)
+                                    List<String> selectedConfigurations,
+                                    @RequestParam(required = false)
+                                    List<String> selectedAccessories) {
+        return cartService.addAnotherProduct(cartId, productId, quantity, selectedConfigurations, selectedAccessories);
     }
 
     @PatchMapping("/{cartId}/code")
