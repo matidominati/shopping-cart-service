@@ -9,7 +9,16 @@ import java.time.ZonedDateTime;
 @ControllerAdvice
 public class CartExceptionHandler {
     @ExceptionHandler(DataNotFoundException.class)
-    public ResponseEntity<Object> handleMedicalException(DataNotFoundException ex) {
+    public ResponseEntity<Object> handleDataNotFoundException(DataNotFoundException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(ErrorResponse.builder()
+                .message(ex.getMessage())
+                .httpStatus(ex.getHttpStatus())
+                .timestamp(ZonedDateTime.now())
+                .build());
+    }
+
+    @ExceptionHandler(CartAlreadyExistsException.class)
+    public ResponseEntity<Object> handleCartAlreadyExistsException(CartAlreadyExistsException ex) {
         return ResponseEntity.status(ex.getHttpStatus()).body(ErrorResponse.builder()
                 .message(ex.getMessage())
                 .httpStatus(ex.getHttpStatus())

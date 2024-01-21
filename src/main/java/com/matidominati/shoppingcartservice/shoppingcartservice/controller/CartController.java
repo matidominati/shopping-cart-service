@@ -1,29 +1,24 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.controller;
 
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartItemEntity;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartTO;
-import com.matidominati.shoppingcartservice.shoppingcartservice.service.ShoppingCartService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.entity.CartItemEntity;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartDto;
+import com.matidominati.shoppingcartservice.shoppingcartservice.service.CartService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/carts")
 public class CartController {
 
-    @Autowired
-    private ShoppingCartService cartService;
+    private final CartService cartService;
 
     @GetMapping("/{cartId}")
-    public CartTO getCart(@PathVariable Long cartId) {
+    public CartDto getCart(@PathVariable Long cartId) {
         return cartService.getCart(cartId);
-    }
-
-    @GetMapping("/{cartId}/items")
-    public List<CartItemEntity> getCartItems(@PathVariable Long cartId) {
-        return cartService.getCartItems(cartId);
     }
 
     @GetMapping("/{cartId}/totalPrice")
@@ -31,34 +26,34 @@ public class CartController {
         return cartService.getTotalPrice(cartId);
     }
 
-    @PostMapping("/{productId}/add")
-    public CartTO addFirstProduct(@PathVariable Long productId,
-                                  @RequestParam(defaultValue = "1") int quantity,
-                                  @RequestParam(required = false)
-                                  List<String> selectedConfigurations,
-                                  @RequestParam(required = false)
-                                  List<String> selectedAccessories) {
-        return cartService.addFirstProduct(productId, quantity, selectedConfigurations, selectedAccessories);
+    @PostMapping("/{productId}")
+    public CartDto addFirstProduct(@PathVariable Long productId,
+                                   @RequestParam(defaultValue = "1") int quantity,
+                                   @RequestParam(required = false)
+                                  List<Long> selectedConfigurationIds,
+                                   @RequestParam(required = false)
+                                  List<Long> selectedAccessoryIds) {
+        return cartService.addFirstProduct(productId, quantity, selectedConfigurationIds, selectedAccessoryIds);
     }
 
-    @PatchMapping("/{cartId}/add")
-    public CartTO addAnotherProduct(@PathVariable Long cartId,
-                                    @RequestParam Long productId,
-                                    @RequestParam(defaultValue = "1") int quantity,
-                                    @RequestParam(required = false)
-                                    List<String> selectedConfigurations,
-                                    @RequestParam(required = false)
-                                    List<String> selectedAccessories) {
-        return cartService.addAnotherProduct(cartId, productId, quantity, selectedConfigurations, selectedAccessories);
+    @PatchMapping("/{cartId}")
+    public CartDto addAnotherProduct(@PathVariable Long cartId,
+                                     @RequestParam Long productId,
+                                     @RequestParam(defaultValue = "1") int quantity,
+                                     @RequestParam(required = false)
+                                    List<Long> selectedConfigurationIds,
+                                     @RequestParam(required = false)
+                                    List<Long> selectedAccessoryIds) {
+        return cartService.addAnotherProduct(cartId, productId, quantity, selectedConfigurationIds, selectedAccessoryIds);
     }
 
     @PatchMapping("/{cartId}/code")
-    public CartTO applyDiscountCode(@PathVariable Long cartId, @RequestParam String discountCode) {
+    public CartDto applyDiscountCode(@PathVariable Long cartId, @RequestParam String discountCode) {
         return cartService.applyDiscountCode(cartId, discountCode);
     }
 
     @PatchMapping("/{cartId}/remove")
-    public CartTO removeProduct(@PathVariable Long cartId, @RequestParam Long itemId) {
+    public CartDto removeProduct(@PathVariable Long cartId, @RequestParam Long itemId) {
         return cartService.removeProduct(cartId, itemId);
     }
 
@@ -68,7 +63,7 @@ public class CartController {
     }
 
     @PutMapping("/{cartId}/clear")
-    public CartTO clearCart(@PathVariable Long cartId) {
+    public CartDto clearCart(@PathVariable Long cartId) {
         return cartService.clearCart(cartId);
     }
 }

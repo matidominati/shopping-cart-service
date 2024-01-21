@@ -1,14 +1,14 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.service;
 
 import com.matidominati.shoppingcartservice.shoppingcartservice.client.ProductClient;
-import com.matidominati.shoppingcartservice.shoppingcartservice.client.model.ProductTO;
+import com.matidominati.shoppingcartservice.shoppingcartservice.client.model.ProductDto;
 import com.matidominati.shoppingcartservice.shoppingcartservice.exception.DataNotFoundException;
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.CartMapper;
 import com.matidominati.shoppingcartservice.shoppingcartservice.mapper.ProductMapper;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartEntity;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.CartItemEntity;
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartTO;
-import com.matidominati.shoppingcartservice.shoppingcartservice.repository.ShoppingCartRepository;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartDto;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.entity.CartEntity;
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.entity.CartItemEntity;
+import com.matidominati.shoppingcartservice.shoppingcartservice.repository.CartRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,28 +19,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.matidominati.shoppingcartservice.shoppingcartservice.utils.CostUtils.calculateTotalPrice;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ShoppingCartService {
+public class CartService {
 
     private final ProductClient productClient;
-    private final ShoppingCartRepository cartRepository;
+    private final CartRepository cartRepository;
     private final CartMapper cartMapper;
     private final ProductMapper productMapper;
 
-    public CartTO getCart(Long cartId) {
+    public CartDto getCart(Long cartId) {
         log.info("Process of displaying shopping cart with ID: {} has started.", cartId);
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
         return cartMapper.map(cart);
-    }
-
-    public List<CartItemEntity> getCartItems(Long cartId) {
-        log.info("Process of displaying the contents of the shopping cart has started.");
-        CartEntity cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-        return cart.getCartItemEntities();
     }
 
     public BigDecimal getTotalPrice(Long cartId) {
@@ -50,25 +45,25 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public CartTO addFirstProduct(Long productId, int quantity, List<String> selectedConfigurations, List<String> selectedAccessories) {
-        ProductTO baseProduct = productClient.customize(productId, selectedConfigurations, selectedAccessories);
+    public CartDto addFirstProduct(Long productId, int quantity, List<Long> selectedConfigurationIds, List<Long> selectedAccessoryIds) {
+        ProductDto baseProduct = productClient.customize(productId, selectedConfigurationIds, selectedAccessoryIds);
         CartItemEntity item = productMapper.map(baseProduct);
         CartEntity cart = createCart();
         item.setQuantity(quantity);
-        cart.getCartItemEntities().add(item);
+        cart.getCartItems().add(item);
         cart.setTotalPrice(calculateTotalPrice(cart));
         cartRepository.save(cart);
         return cartMapper.map(cart);
     }
 
     @Transactional
-    public CartTO addAnotherProduct(Long cartId, Long productId, int quantity, List<String> selectedConfigurations, List<String> selectedAccessories) {
+    public CartDto addAnotherProduct(Long cartId, Long productId, int quantity, List<Long> selectedConfigurationIds, List<Long> selectedAccessoryIds) {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-        ProductTO baseProduct = productClient.customize(productId, selectedConfigurations, selectedAccessories);
+        ProductDto baseProduct = productClient.customize(productId, selectedConfigurationIds, selectedAccessoryIds);
         CartItemEntity newItem = productMapper.map(baseProduct);
         newItem.setQuantity(quantity);
-        cart.getCartItemEntities().add(newItem);
+        cart.getCartItems().add(newItem);
         cart.setTotalPrice(calculateTotalPrice(cart));
         cart.setModifiedAt(LocalDateTime.now());
         cartRepository.save(cart);
@@ -76,14 +71,12 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public CartTO applyDiscountCode(Long cartId, String discountCode) {
+    public CartDto applyDiscountCode(Long cartId, String discountCode) {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-
         if (cart.getDiscounts() != null && cart.getDiscounts().containsKey(discountCode)) {
             BigDecimal discountPercentage = cart.getDiscounts().get(discountCode);
             BigDecimal discountAmount = cart.getTotalPrice().multiply(discountPercentage);
-
             cart.setDiscountCode(discountCode);
             cart.setDiscountPercentage(discountPercentage);
             cart.setTotalPrice(cart.getTotalPrice().subtract(discountAmount));
@@ -96,18 +89,15 @@ public class ShoppingCartService {
         return cartMapper.map(cart);
     }
 
-
     @Transactional
-    public CartTO removeProduct(Long cartId, Long itemId) {
+    public CartDto removeProduct(Long cartId, Long itemId) {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-
-        Optional<CartItemEntity> itemToRemove = cart.getCartItemEntities().stream()
+        Optional<CartItemEntity> itemToRemove = cart.getCartItems().stream()
                 .filter(item -> item.getId().equals(itemId))
                 .findFirst();
-
         if (itemToRemove.isPresent()) {
-            cart.getCartItemEntities().remove(itemToRemove.get());
+            cart.getCartItems().remove(itemToRemove.get());
             cart.setTotalPrice(calculateTotalPrice(cart));
             cart.setModifiedAt(LocalDateTime.now());
             cartRepository.save(cart);
@@ -129,10 +119,10 @@ public class ShoppingCartService {
     }
 
     @Transactional
-    public CartTO clearCart(Long cartId) {
+    public CartDto clearCart(Long cartId) {
         CartEntity cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new DataNotFoundException("Shopping cart not found."));
-        cart.getCartItemEntities().clear();
+        cart.getCartItems().clear();
         cart.setTotalPrice(BigDecimal.ZERO);
         cartRepository.save(cart);
         log.info("Shopping cart cleared. Cart ID: {}.", cartId);
@@ -145,11 +135,5 @@ public class ShoppingCartService {
         cartRepository.save(cart);
         log.info("Process of creating shopping cart with ID: {}  has been completed.", cart.getId());
         return cart;
-    }
-
-    private BigDecimal calculateTotalPrice(CartEntity cart) {
-        return cart.getCartItemEntities().stream()
-                .map(item -> item.getBasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

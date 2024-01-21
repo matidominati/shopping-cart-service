@@ -1,5 +1,6 @@
-package com.matidominati.shoppingcartservice.shoppingcartservice.model;
+package com.matidominati.shoppingcartservice.shoppingcartservice.model.entity;
 
+import com.matidominati.shoppingcartservice.shoppingcartservice.model.entity.CartEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +21,7 @@ public class CartItemEntity {
     private String productName;
     private String productType;
     private String productDescription;
-    private BigDecimal basePrice;
-    private BigDecimal totalPrice;
+    private BigDecimal price;
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private CartEntity cart;
