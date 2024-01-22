@@ -9,6 +9,6 @@ public class CartItemDto {
     private String productName;
     private String productType;
     private String productDescription;
-    private int quantity;
+    private Integer quantity;
     private BigDecimal price;
 }

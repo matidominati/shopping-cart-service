@@ -1,6 +1,5 @@
 package com.matidominati.shoppingcartservice.shoppingcartservice.controller;
 
-import com.matidominati.shoppingcartservice.shoppingcartservice.model.entity.CartItemEntity;
 import com.matidominati.shoppingcartservice.shoppingcartservice.model.dto.CartDto;
 import com.matidominati.shoppingcartservice.shoppingcartservice.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -28,23 +27,23 @@ public class CartController {
 
     @PostMapping("/{productId}")
     public CartDto addFirstProduct(@PathVariable Long productId,
-                                   @RequestParam(defaultValue = "1") int quantity,
+                                   @RequestParam(defaultValue = "1") Integer quantity,
                                    @RequestParam(required = false)
-                                  List<Long> selectedConfigurationIds,
+                                   List<Long> selectedConfigurationIds,
                                    @RequestParam(required = false)
-                                  List<Long> selectedAccessoryIds) {
+                                   List<Long> selectedAccessoryIds) {
         return cartService.addFirstProduct(productId, quantity, selectedConfigurationIds, selectedAccessoryIds);
     }
 
     @PatchMapping("/{cartId}")
-    public CartDto addAnotherProduct(@PathVariable Long cartId,
-                                     @RequestParam Long productId,
-                                     @RequestParam(defaultValue = "1") int quantity,
-                                     @RequestParam(required = false)
-                                    List<Long> selectedConfigurationIds,
-                                     @RequestParam(required = false)
-                                    List<Long> selectedAccessoryIds) {
-        return cartService.addAnotherProduct(cartId, productId, quantity, selectedConfigurationIds, selectedAccessoryIds);
+    public CartDto addProduct(@PathVariable Long cartId,
+                              @RequestParam Long productId,
+                              @RequestParam(defaultValue = "1") Integer quantity,
+                              @RequestParam(required = false)
+                              List<Long> selectedConfigurationIds,
+                              @RequestParam(required = false)
+                              List<Long> selectedAccessoryIds) {
+        return cartService.addProduct(cartId, productId, quantity, selectedConfigurationIds, selectedAccessoryIds);
     }
 
     @PatchMapping("/{cartId}/code")
@@ -62,7 +61,7 @@ public class CartController {
         cartService.deleteCart(cartId);
     }
 
-    @PutMapping("/{cartId}/clear")
+    @DeleteMapping("/{cartId}/clear")
     public CartDto clearCart(@PathVariable Long cartId) {
         return cartService.clearCart(cartId);
     }

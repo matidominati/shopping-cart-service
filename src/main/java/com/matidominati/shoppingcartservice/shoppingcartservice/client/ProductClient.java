@@ -10,12 +10,9 @@ import java.util.List;
 
 @FeignClient(name = "product-service", url = "${product.service.api.url}")
 public interface ProductClient {
-    @PostMapping("/products/customize/{baseProductId}")
+    @PostMapping("/products/{productId}/customize")
     ProductDto customize(@PathVariable Long baseProductId,
                          @RequestParam(required = false) List<Long> selectedConfigurationIds,
                          @RequestParam(required = false) List<Long> selectedAccessoryIds);
 
 }
-
-
-

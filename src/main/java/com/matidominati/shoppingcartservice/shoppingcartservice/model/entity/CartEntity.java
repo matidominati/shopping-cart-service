@@ -3,7 +3,6 @@ package com.matidominati.shoppingcartservice.shoppingcartservice.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,6 +51,7 @@ public class CartEntity {
         CartEntity shoppingCart = (CartEntity) o;
         return id != null && Objects.equals(id, shoppingCart.id);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash();
